@@ -10,12 +10,12 @@ py sanfoundry.py
 ### If you don't want to clone and execute script use below link.
 #### Note: The web app only generates pdf files and takes sanfoundry links only where mcqs are visible. Please see below image to understand
 
-[Sanfoundry Scraper](https://sanfoundry-scraper.herokuapp.com/)
+## [Use Sanfoundry Scraper Web App](https://sanfoundry-scraper.herokuapp.com/)
 
 The web app uses this type of link.
 
-![Single MCQ SET](images/single_link.png)
+![Single MCQ SET](https://github.com/falcon883/Sanfoundry-MCQ-Saver/blob/main/images/single_link.PNG)
 
 Script uses above type of link as well as below link i.e. It can get all the mcqs sets if needed.
 
-![Multiple MCQ SET](images/multi_link.png)
+![Multiple MCQ SET](https://github.com/falcon883/Sanfoundry-MCQ-Saver/blob/main/images/multi_link.PNG)
