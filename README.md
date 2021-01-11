@@ -4,7 +4,6 @@
 ## Usage:
 
 ```
-pip install -r requirements.txt
 py sanfoundry.py
 ```
 Script uses below types of link.
