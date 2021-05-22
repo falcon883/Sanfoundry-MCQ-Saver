@@ -34,7 +34,7 @@ class Sanfoundry(object):
     def auto(self):
         urlList = UrlsClass().getUrls()
         print("\n")
-        for i in tqdm(range(0, len(urlList)), desc="Saving Mcqs"):
+        for i in tqdm(range(0, len(urlList)), desc="Saving MCQs"):
             self.url = urlList[i]
             self.scrape()
 
