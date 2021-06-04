@@ -16,3 +16,8 @@ For downloading single mcq page.
 For downloading all mcq sets.
 
 ![Multiple MCQ SET](https://github.com/falcon883/Sanfoundry-MCQ-Saver/blob/main/images/multi_link.PNG)
+
+
+
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/falcon883)
