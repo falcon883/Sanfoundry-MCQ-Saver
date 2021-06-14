@@ -91,7 +91,7 @@ class Sanfoundry(object):
         merger = PdfFileMerger()
         
         for names in file_names:
-            merger.append(open(path+names,'rb'))
+            merger.append(open(path+names,'rb'), import_bookmarks=False)
         
         with open("final_merge.pdf","wb") as fout:
             merger.write(fout)
