@@ -1,5 +1,8 @@
 # Sanfoundry-MCQ-Saver
 ### Saves all the mcqs to a pdf file and merges them to `final_merge.pdf`.
+
+#### Note: Move your previous `final_merge.pdf` to different location before saving new mcqs as it will get overwritten.
+
 #### Keep sanUrls.py and sanfoundry.py in the same folder.
 
 # Steps to run:
