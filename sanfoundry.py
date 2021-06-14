@@ -3,9 +3,9 @@ import re
 
 import pdfkit
 import requests
+from PyPDF2 import PdfFileMerger, PdfFileReader
 from bs4 import BeautifulSoup as bs
 from tqdm import tqdm
-from PyPDF2 import PdfFileMerger
 
 from sanUrls import UrlsClass
 
@@ -18,7 +18,10 @@ def check_dir():
 class Sanfoundry(object):
 
     def __init__(self):
-        self.mode = int(input("\nEnter 0 to download 'Single MCQ Page' \n\nEnter 1 to download 'MCQ Sets' \n\nEnter 2 to merge existing pdfs \n\nNOTE: By default selecting option 1 will merge all pdf for you and delete existing pdfs in SanfoundryFiles/ : "))
+        self.mode = int(input(
+            "\nEnter 0 to download 'Single MCQ Page' \n\nEnter 1 to download 'MCQ Sets' \n\nEnter 2 to merge existing "
+            "pdfs \n\nNOTE: By default selecting the option '1' will merge and delete"
+            "all the existing pdfs in SanfoundryFiles/ : "))
         self.extract_line = r"<p>\s*<strong>.*</strong>.*</p>"
         self.classes = lambda x: x and x.startswith(
             ('mobile-content', 'desktop-content', 'sf-nav-bottom', 'sf-mobile-ads', 'sf-video-yt'))
@@ -26,7 +29,8 @@ class Sanfoundry(object):
             'quiet': '',
             'encoding': 'utf-8',
         }
-        
+        self.sf_path = "SanfoundryFiles/"
+
         if self.mode == 1:
             self.auto()
             self.merge_all_pdf()
@@ -34,14 +38,14 @@ class Sanfoundry(object):
 
         elif self.mode == 2:
             self.merge_all_pdf()
-      
+
         else:
             self.url = input("\nEnter Sanfoundry MCQ URL: ")
             self.scrape()
 
     def auto(self):
         urlList = UrlsClass().getUrls()
-        print("\n")
+
         for i in tqdm(range(0, len(urlList)), desc="Saving MCQs"):
             self.url = urlList[i]
             self.scrape()
@@ -55,7 +59,8 @@ class Sanfoundry(object):
             [tag.extract() for tag in div(['script', 'a'])]
             [tag.extract() for tag in div.find_all(["div"], {"class": self.classes})]
             [tag.extract() for tag in div.find_all("span", {"class": "collapseomatic"})]
-            [tag.extract() for tag in div.find_all("div") if tag.text == "advertisment"]
+            [tag.extract() for tag in div.find_all("div") if
+             tag.text == "advertisment" or tag.get('id') == "sf-video-ads"]
             for tags in div.find_all(True):
                 tags.attrs = {}
             data = ' '.join(str(div).split())
@@ -68,7 +73,7 @@ class Sanfoundry(object):
             head.append(html.new_tag('style', type='text/css'))
             head.style.append('*{font-family: Arial, Helvetica, sans-serif !important;}')
             pdfkit.from_string(
-                str(html), "SanfoundryFiles/"+filename+".pdf", options=self.pdf_options)
+                str(html), f"{self.sf_path}{filename}.pdf", options=self.pdf_options)
 
             if self.mode == 0:
                 more = input("Scrape More? (Y/N): ").lower().strip()
@@ -83,25 +88,29 @@ class Sanfoundry(object):
                 except Exception as error:
                     print("An Error Occured: ")
                     print(error)
-    
-    def merge_all_pdf(self): 
-        path = 'SanfoundryFiles/'
-        file_names = os.listdir(path)
+
+    def merge_all_pdf(self):
+        pdf_files = os.listdir(self.sf_path)
+
+        if not pdf_files:
+            print("No PDF Files Found.")
+            exit()
 
         merger = PdfFileMerger()
-        
-        for names in file_names:
-            merger.append(open(path+names,'rb'), import_bookmarks=False)
-        
-        with open("final_merge.pdf","wb") as fout:
+
+        for pdf_file in pdf_files:
+            with open(self.sf_path + pdf_file, "rb") as pdf:
+                merger.append(PdfFileReader(pdf), import_bookmarks=False)
+                pdf.close()
+
+        with open("final_merge.pdf", "wb") as fout:
             merger.write(fout)
-    
+
     def delete_pdf_parts(self):
-        path = 'SanfoundryFiles/' 
-        files_to_delete = os.listdir(path)
+        files_to_delete = os.listdir(self.sf_path)
 
         for file_name in files_to_delete:
-            os.remove(os.path.join(path,file_name))
+            os.remove(os.path.join(self.sf_path, file_name))
 
 
 if __name__ == '__main__':

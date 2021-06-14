@@ -2,10 +2,13 @@ beautifulsoup4==4.9.3
 bs4==0.0.1
 certifi==2021.5.30
 chardet==4.0.0
+html5lib==1.1
 idna==2.10
 pdfkit==0.6.1
 PyPDF2==1.26.0
 requests==2.25.1
+six==1.16.0
 soupsieve==2.2.1
 tqdm==4.61.1
 urllib3==1.26.5
+webencodings==0.5.1
