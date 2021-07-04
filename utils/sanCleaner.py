@@ -42,23 +42,32 @@ class Cleaner(object):
         content.attrs = {}
 
         for tag in content.find_all():
+            # Remove empty tags
+            if len(tag.get_text(strip=True)) == 0:
+                tag.decompose()
+                continue
+
             # Remove all script and style tags
             if tag.name in self.tags:
                 tag.decompose()
+                continue
 
             # Remove tags with specified id
             if tag.id and tag.id in self.ids:
                 tag.decompose()
+                continue
 
             # Remove tags with specified classes
             if tag.attrs and any(cls in self.classes for cls in tag.attrs.get('class', [])):
                 tag.decompose()
+                continue
+
+            # Cleaning unwanted text
+            if tag.text and self.text(tag.get_text(strip=True)):
+                tag.decompose()
+                continue
 
             # Remove all attributes from tag
             tag.attrs = {}
-
-            # Cleaning unwanted text
-            if tag.text and self.text(tag.text.strip()):
-                tag.decompose()
 
         return add_style(content)
