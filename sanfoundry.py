@@ -1,5 +1,4 @@
 import os
-import re
 
 import pdfkit
 import requests
@@ -7,7 +6,8 @@ from PyPDF2 import PdfFileMerger, PdfFileReader
 from bs4 import BeautifulSoup as bs
 from tqdm import tqdm
 
-from sanUrls import UrlsClass
+from utils.sanCleaner import Cleaner
+from utils.sanUrls import Urls
 
 
 def check_dir():
@@ -20,11 +20,8 @@ class Sanfoundry(object):
     def __init__(self):
         self.mode = int(input(
             "\nEnter 0 to download 'Single MCQ Page' \n\nEnter 1 to download 'MCQ Sets' \n\nEnter 2 to merge existing "
-            "pdfs \n\nNOTE: By default selecting the option '1' will merge and delete"
+            "pdfs \n\nNOTE: By default selecting the option '1' will merge and delete "
             "all the existing pdfs in SanfoundryFiles/ : "))
-        self.extract_line = r"<p>\s*<strong>.*</strong>.*</p>"
-        self.classes = lambda x: x and x.startswith(
-            ('mobile-content', 'desktop-content', 'sf-nav-bottom', 'sf-mobile-ads', 'sf-video-yt'))
         self.pdf_options = {
             'quiet': '',
             'encoding': 'utf-8',
@@ -44,7 +41,7 @@ class Sanfoundry(object):
             self.scrape()
 
     def auto(self):
-        urlList = UrlsClass().getUrls()
+        urlList = Urls().getUrls()
 
         for i in tqdm(range(0, len(urlList)), desc="Saving MCQs"):
             self.url = urlList[i]
@@ -55,25 +52,10 @@ class Sanfoundry(object):
             r = s.get(self.url)
             soup = bs(r.content, "html5lib")
             div = soup.find("div", {"class": "entry-content"})
-            div.attrs = {}
-            [tag.extract() for tag in div(['script', 'a'])]
-            [tag.extract() for tag in div.find_all(["div"], {"class": self.classes})]
-            [tag.extract() for tag in div.find_all("span", {"class": "collapseomatic"})]
-            [tag.extract() for tag in div.find_all("div") if
-             tag.text == "advertisment" or tag.get('id') == "sf-video-ads"]
-            for tags in div.find_all(True):
-                tags.attrs = {}
-            data = ' '.join(str(div).split())
-            data = re.sub(self.extract_line, "", data)
-
+            html = Cleaner().clean(div)
             filename = self.url.split("/")[3]
             check_dir()
-            html = bs(data, "html5lib")
-            head = html.head
-            head.append(html.new_tag('style', type='text/css'))
-            head.style.append('*{font-family: Arial, Helvetica, sans-serif !important;}')
-            pdfkit.from_string(
-                str(html), f"{self.sf_path}{filename}.pdf", options=self.pdf_options)
+            pdfkit.from_string(html, f"{self.sf_path}{filename}.pdf", options=self.pdf_options)
 
             if self.mode == 0:
                 more = input("Scrape More? (Y/N): ").lower().strip()
