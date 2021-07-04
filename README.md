@@ -29,3 +29,9 @@ For downloading all mcq sets.
 
 ![Multiple MCQ SET](https://github.com/falcon883/Sanfoundry-MCQ-Saver/blob/main/images/multi_link.PNG)
 
+
+You can also use these types of link (Program Examples):
+
+Program Sets: https://www.sanfoundry.com/c-programming-examples-stacks/
+
+Single Programs: https://www.sanfoundry.com/c-program-stack-implementation/
