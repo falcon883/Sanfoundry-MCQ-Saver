@@ -59,10 +59,13 @@ class Sanfoundry(object):
         with requests.Session() as s:
             r = s.get(self.url)
             soup = bs(r.content, "html5lib")
-            div = soup.find("div", {"class": "entry-content"})
-            html = Cleaner().clean(div)
+            html, mathjax = Cleaner().clean(soup)
             filename = self.url.split("/")[3]
             check_dir(self.sf_path)
+
+            if mathjax:
+                self.pdf_options['window-status'] = 'Rendered'
+
             pdfkit.from_string(html, f"{self.sf_path}{filename}.pdf", options=self.pdf_options)
 
             if self.mode == 0:
