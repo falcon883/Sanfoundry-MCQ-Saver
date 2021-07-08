@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 import pdfkit
 import requests
@@ -10,32 +11,39 @@ from utils.sanCleaner import Cleaner
 from utils.sanUrls import Urls
 
 
-def check_dir():
-    if not os.path.exists('SanfoundryFiles'):
-        os.makedirs('SanfoundryFiles')
+def check_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
+def confirm_prompt(question: str) -> bool:
+    reply = None
+    while reply not in ("", "y", "n"):
+        reply = input(f"{question} (Y/n): ").lower()
+    return reply in ("", "y")
 
 
 class Sanfoundry(object):
 
     def __init__(self):
         self.mode = int(input(
-            "\nEnter 0 to download 'Single MCQ Page' \n\nEnter 1 to download 'MCQ Sets' \n\nEnter 2 to merge existing "
-            "pdfs \n\nNOTE: By default selecting the option '1' will merge and delete "
-            "all the existing pdfs in SanfoundryFiles/ : "))
+            "\nEnter 0 to download 'Single MCQ Page' "
+            "\nEnter 1 to download 'MCQ Sets' "
+            "\nEnter 2 to merge existing pdfs"
+            "\n\nEnter Input (0 - 2): "
+        ))
         self.pdf_options = {
             'quiet': '',
             'encoding': 'utf-8',
         }
         self.sf_path = "SanfoundryFiles/"
+        self.merged_path = "Merged Pdfs/"
 
         if self.mode == 1:
             self.auto()
             self.merge_all_pdf()
-            self.delete_pdf_parts()
-
         elif self.mode == 2:
             self.merge_all_pdf()
-
         else:
             self.url = input("\nEnter Sanfoundry MCQ URL: ")
             self.scrape()
@@ -51,33 +59,31 @@ class Sanfoundry(object):
         with requests.Session() as s:
             r = s.get(self.url)
             soup = bs(r.content, "html5lib")
-            div = soup.find("div", {"class": "entry-content"})
-            html = Cleaner().clean(div)
+            html, mathjax = Cleaner().clean(soup)
             filename = self.url.split("/")[3]
-            check_dir()
+            check_dir(self.sf_path)
+
+            if mathjax:
+                self.pdf_options['window-status'] = 'Rendered'
+
             pdfkit.from_string(html, f"{self.sf_path}{filename}.pdf", options=self.pdf_options)
 
             if self.mode == 0:
-                more = input("Scrape More? (Y/N): ").lower().strip()
-                try:
-                    if more[0] == 'y':
-                        self.url = input("\nEnter Sanfoundry MCQ URL: ")
-                        self.scrape()
-                    elif more[0] == 'n':
-                        exit()
-                    else:
-                        print('Invalid Input')
-                except Exception as error:
-                    print("An Error Occured: ")
-                    print(error)
+                more = confirm_prompt("Scrape More?")
+                if more:
+                    self.url = input("\nEnter Sanfoundry MCQ URL: ")
+                    self.scrape()
+                else:
+                    exit()
 
     def merge_all_pdf(self):
         pdf_files = os.listdir(self.sf_path)
 
         if not pdf_files:
-            print("No PDF Files Found.")
+            print("\nNo PDF Files Found.")
             exit()
 
+        delete = confirm_prompt("Delete pdfs after merging?")
         merger = PdfFileMerger()
 
         for pdf_file in pdf_files:
@@ -85,10 +91,15 @@ class Sanfoundry(object):
                 merger.append(PdfFileReader(pdf), import_bookmarks=False)
                 pdf.close()
 
-        with open("final_merge.pdf", "wb") as fout:
+        check_dir(self.merged_path)
+        current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
+        with open(f"{self.merged_path}Sanfoundry_Merged_{current_time}.pdf", "wb") as fout:
             merger.write(fout)
 
-    def delete_pdf_parts(self):
+        if delete:
+            self.delete_all_pdf()
+
+    def delete_all_pdf(self):
         files_to_delete = os.listdir(self.sf_path)
 
         for file_name in files_to_delete:
