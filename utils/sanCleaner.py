@@ -55,8 +55,9 @@ class Cleaner(object):
         ]
         self.text = lambda x: x and x.startswith((
             'Sanfoundry Global Education',
-            'To practice all areas',
-            'Participate in the Sanfoundry Certification',
+            'To practice',
+            'Participate in',
+            'to get free Certificate',
             'advertisment',
         ))
 
@@ -82,7 +83,7 @@ class Cleaner(object):
                     img.parent.unwrap()
 
             # Remove all script and anchor tags
-            if tag.name in self.tags:
+            if tag.name in self.tags or tag.find("a", recursive=False):
                 tag.decompose()
                 continue
 
@@ -102,11 +103,17 @@ class Cleaner(object):
                 continue
 
             # Remove empty tags
-            if len(tag.get_text(strip=True)) == 0:
+            if not tag.get_text(strip=True):
                 tag.decompose()
                 continue
 
             # Remove all attributes from tag
             tag.attrs = {}
 
+        # Remove text without tags
+        all_text = content.find_all(text=True)
+        for t in all_text:
+            text = t.strip()
+            if self.text(text):
+                content.find(text=t).replaceWith('')
         return add_tags(content, self.has_mathjax)

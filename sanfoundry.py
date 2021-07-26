@@ -49,10 +49,10 @@ class Sanfoundry(object):
             self.scrape()
 
     def auto(self):
-        urlList = Urls().getUrls()
+        url_list = Urls().getUrls()
 
-        for i in tqdm(range(0, len(urlList)), desc="Saving MCQs"):
-            self.url = urlList[i]
+        for url in tqdm(url_list, desc="Saving MCQs"):
+            self.url = url
             self.scrape()
 
     def scrape(self):
