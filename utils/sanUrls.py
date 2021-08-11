@@ -11,7 +11,7 @@ class Urls(object):
         self.url = input("\nEnter Sanfoundry Mcq Url where all sections are listed: ")
         self.urlList = list()
         self.regx_url = re.compile(
-            "^(http://www\.|https://www\.|http://|https://)?[a-z0-9]+([\-.]{1}[a-z0-9]+)*\.[a-z]{2,"
+            r"^(http://www\.|https://www\.|http://|https://)?[a-z0-9]+([\-.]{1}[a-z0-9]+)*\.[a-z]{2,"
             "5}(:[0-9]{1,5})?(/.*)?$")
 
     def getUrls(self):
