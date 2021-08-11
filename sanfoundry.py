@@ -5,6 +5,7 @@ import pdfkit
 import requests
 from PyPDF2 import PdfFileMerger, PdfFileReader
 from bs4 import BeautifulSoup as bs
+import sys
 from tqdm import tqdm
 
 from utils.sanCleaner import Cleaner
@@ -74,14 +75,14 @@ class Sanfoundry(object):
                     self.url = input("\nEnter Sanfoundry MCQ URL: ")
                     self.scrape()
                 else:
-                    exit()
+                    sys.exit()
 
     def merge_all_pdf(self):
         pdf_files = os.listdir(self.sf_path)
 
         if not pdf_files:
             print("\nNo PDF Files Found.")
-            exit()
+            sys.exit()
 
         delete = confirm_prompt("Delete pdfs after merging?")
         merger = PdfFileMerger()
