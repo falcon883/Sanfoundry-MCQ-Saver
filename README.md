@@ -12,7 +12,7 @@
 
     - Windows
 
-      Use binary installers, download from [here](https://wkhtmltopdf.org/downloads.html)
+      Use binary installer, download from [here](https://wkhtmltopdf.org/downloads.html)
 
       OR
 
