@@ -14,6 +14,13 @@
 
       Use binary installers, download from [here](https://wkhtmltopdf.org/downloads.html)
 
+      OR
+
+      If [Chocolatey](https://chocolatey.org/) is installed
+      ```
+      choco install wkhtmltopdf
+      ```
+
     - Debian/Ubuntu
 
       ```
