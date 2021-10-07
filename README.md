@@ -3,17 +3,31 @@
 
 # Steps to run:
 
-```
-pip install -r requirements.txt
-```
-```
-python sanfoundry.py
-```
-## If you find any issues installing pdfkit, follow these 2 documentation pages
-### pdfkit
-https://pypi.org/project/pdfkit/
-### wkhtmltopdf
-https://pypi.org/project/wkhtmltopdf/
+1. Install required libraries:
+
+    ```
+    pip install -r requirements.txt
+    ```
+2. Install wkhtmltopdf:
+
+    - Windows
+
+      Use binary installers, download from [here](https://wkhtmltopdf.org/downloads.html)
+
+    - Debian/Ubuntu
+
+      ```
+      sudo apt-get install wkhtmltopdf
+      ```
+    - macOS
+    
+      ```
+      brew install homebrew/cask/wkhtmltopdf
+      ```
+3. Run the script
+    ```
+    python sanfoundry.py
+    ```
 
 Script uses below types of link.
 
