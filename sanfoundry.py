@@ -36,6 +36,7 @@ class Sanfoundry(object):
         self.pdf_options = {
             'quiet': '',
             'encoding': 'utf-8',
+            'enable-local-file-access': '',
         }
         self.sf_path = "SanfoundryFiles/"
         self.merged_path = "Merged Pdfs/"
