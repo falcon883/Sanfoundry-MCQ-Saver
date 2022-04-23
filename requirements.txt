@@ -7,7 +7,7 @@ colorama==0.4.4
 html5lib==1.1
 idna==3.2
 pdfkit==0.6.1
-PyPDF2==1.26.0
+PyPDF2==1.27.5
 requests==2.26.0
 six==1.16.0
 soupsieve==2.2.1
