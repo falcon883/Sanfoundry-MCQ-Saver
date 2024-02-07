@@ -1,5 +1,7 @@
+import base64
 from pathlib import Path
 
+import requests
 from bs4 import BeautifulSoup as bs, Doctype
 
 
@@ -51,6 +53,7 @@ class Cleaner(object):
             'sf-mobile-ads',
             'sf-video-yt',
             'sf-post-footer',
+            'sf-post-content-category',
             'collapseomatic',
         ]
         self.text = lambda x: x and x.startswith((
@@ -79,8 +82,16 @@ class Cleaner(object):
                 if 'lazyload' in img.get('class', []):
                     img.decompose()
                 elif img.parent.name == 'noscript':
-                    img.parent.unwrap()
-                    img.parent.unwrap()
+                    try:
+                        img.parent.unwrap()
+                        img.parent.unwrap()
+                    except ValueError as _:
+                        pass
+
+                if img and img.attrs:
+                    isrc = img.attrs.get('src', '')
+                    imgb64 = base64.b64encode(requests.get(isrc, timeout=120).content).decode()
+                    img['src'] = 'data:image/jpeg;base64,' + imgb64
 
             # Remove all script and anchor tags
             if tag.name in self.tags or tag.find("a", recursive=False):

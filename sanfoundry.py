@@ -1,9 +1,9 @@
 import os
 from datetime import datetime
 
-import pdfkit
-import requests
-from PyPDF2 import PdfFileMerger, PdfFileReader
+import cloudscraper
+from xhtml2pdf import pisa
+from PyPDF2 import PdfMerger, PdfReader
 from bs4 import BeautifulSoup as bs
 import sys
 from tqdm import tqdm
@@ -24,6 +24,22 @@ def confirm_prompt(question: str) -> bool:
     return reply in ("", "y")
 
 
+def convert_html_to_pdf(source_html, output_filename):
+    # open output file for writing (truncated binary)
+    result_file = open(output_filename, "w+b")
+
+    # convert HTML to PDF
+    pisa_status = pisa.CreatePDF(
+        source_html,  # the HTML to convert
+        dest=result_file)  # file handle to recieve result
+
+    # close output file
+    result_file.close()  # close output file
+
+    # return False on success and True on errors
+    return pisa_status.err
+
+
 class Sanfoundry(object):
 
     def __init__(self):
@@ -34,7 +50,6 @@ class Sanfoundry(object):
             "\n\nEnter Input (0 - 2): "
         ))
         self.pdf_options = {
-            'quiet': '',
             'encoding': 'utf-8',
             'enable-local-file-access': '',
         }
@@ -58,7 +73,7 @@ class Sanfoundry(object):
             self.scrape()
 
     def scrape(self):
-        with requests.Session() as s:
+        with cloudscraper.CloudScraper() as s:
             r = s.get(self.url)
             soup = bs(r.content, "html5lib")
             html, mathjax = Cleaner().clean(soup)
@@ -68,7 +83,7 @@ class Sanfoundry(object):
             if mathjax:
                 self.pdf_options['window-status'] = 'Rendered'
 
-            pdfkit.from_string(html, f"{self.sf_path}{filename}.pdf", options=self.pdf_options)
+            convert_html_to_pdf(html, f"{self.sf_path}{filename}.pdf")
 
             if self.mode == 0:
                 more = confirm_prompt("Scrape More?")
@@ -86,11 +101,11 @@ class Sanfoundry(object):
             sys.exit()
 
         delete = confirm_prompt("Delete pdfs after merging?")
-        merger = PdfFileMerger()
+        merger = PdfMerger()
 
         for pdf_file in pdf_files:
             with open(self.sf_path + pdf_file, "rb") as pdf:
-                merger.append(PdfFileReader(pdf), import_bookmarks=False)
+                merger.append(PdfReader(pdf), import_outline=False)
                 pdf.close()
 
         check_dir(self.merged_path)
